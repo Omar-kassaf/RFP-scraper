@@ -6,3 +6,5 @@ python-dotenv
 functions-framework
 openpyxl
 streamlit
+google-cloud-aiplatform 
+google-cloud-logging
