@@ -84,7 +84,7 @@ def post_process_results(term, tenders, term_tenders):
     df.to_csv(f"tenders_{term}.csv", index=False, encoding='utf-8-sig')
     return df
 
-def get_tenders_from_page(term_tenders):
+def get_tenders_from_page(term_tenders,driver):
     parent_tender_divs = driver.find_element(By.XPATH, '//*[@id="cardsresult"]/div[1]')
     child_tender_divs = parent_tender_divs.find_elements(By.CLASS_NAME, "row")
     links = parent_tender_divs.find_elements(By.XPATH,"//a[contains(text(), 'التفاصيل')]")
@@ -103,13 +103,13 @@ def get_tenders_from_page(term_tenders):
             el.insert(-3, "N/A")            
         i += 1
         
-def start_parsing(term, tenders, term_tenders):
+def start_parsing(term, tenders, term_tenders,driver):
     current_page = 1
     try:
         pages_elements = driver.find_element(By.XPATH, '//*[@id="cardsresult"]/div[2]/div/nav/ul')
     except Exception as e:
         print(f"No pagination found, either no tenders or a single page for term: {term}")
-        get_tenders_from_page(term_tenders)  
+        get_tenders_from_page(term_tenders,driver)  
         if term_tenders:  
             tenders[term] = term_tenders
             post_process_results(term, tenders, term_tenders)
@@ -142,7 +142,7 @@ def start_parsing(term, tenders, term_tenders):
                     pages_elements = driver.find_element(By.XPATH, '//*[@id="cardsresult"]/div[2]/div/nav/ul')
                     pages = [int(el) for el in pages_elements.text.split('\n') if el.isdigit()]
         
-        get_tenders_from_page(term_tenders)
+        get_tenders_from_page(term_tenders,driver)
         pages = set(pages) - pages_passed
         print("pages: ", pages)
         current_page += 1
