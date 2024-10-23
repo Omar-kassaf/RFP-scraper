@@ -47,9 +47,9 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--log-level=1")
 
-# chrome_options.binary_location= 'new_chromedriver'
-driver = webdriver.Chrome(options=chrome_options)
-driver.maximize_window()
+# # chrome_options.binary_location= 'new_chromedriver'
+# driver = webdriver.Chrome(options=chrome_options)
+# driver.maximize_window()
 
 def post_process_results(term, tenders, term_tenders):
     if not term_tenders:
@@ -155,67 +155,122 @@ def start_parsing(term, tenders, term_tenders):
 
     return
 
+# def setup_search(term, tenders, term_tenders, main_activityy):
+#     print("getting etimad website..")
+#     website_url = "https://tenders.etimad.sa/Tender/AllTendersForVisitor?PageNumber=1"
+#     driver.get(website_url)
+#     print("got etimad website successfully!!!")
+#     # expand search
+#     search_button = driver.find_element(By.XPATH, "//*[@id='searchBtnColaps']")  # Replace 'button_id' with the actual ID or XPath of the button
+#     search_button.click()
+
+#     # click choose tender status
+#     driver.execute_script("window.scrollBy(0, 500);")
+#     time.sleep(4)
+#     status_button = driver.find_element(By.XPATH,"//*[@id='basicInfo']/div/div[2]/div/div/button")                        
+#     status_button.click()
+
+#     # choose active tenders
+#     driver.execute_script("window.scrollBy(0, 50);")
+#     time.sleep(4)
+#     span_element = driver.find_element(By.XPATH,'//*[@id="basicInfo"]/div/div[2]/div/div/div/ul/li[2]/a')                                                                     
+#     span_element.click()
+
+#     driver.execute_script("window.scrollBy(0, 175);")
+#     time.sleep(4)
+#     main_activity = driver.find_element(By.XPATH, '//*[@id="basicInfo"]/div/div[4]/div/div/button')
+#     main_activity.click()
+
+    
+#     # type اتص to filter results
+#     input_element = driver.find_element(By.XPATH, '//*[@id="basicInfo"]/div/div[4]/div/div/div/div/input')
+#     input_element.clear()
+#     input_element.send_keys(str(main_activityy))
+
+#     option_xpath = get_xpath_for_option(main_activityy)
+#     if option_xpath != "Option not found in the dropdown list.":
+#         # Choose the selected option
+#         selected_option_element = driver.find_element(By.XPATH, option_xpath)
+#         selected_option_element.click()
+#     else:
+#         print("Error: Selected option not found in the dropdown list.")
+#         return
+    
+
+#     driver.execute_script("window.scrollBy(0, 50);")
+
+#     input_element = driver.find_element(By.XPATH, '//*[@id="txtMultipleSearch"]')
+#     input_element.clear()
+#     input_element.send_keys(term)
+
+#     # finally hit search
+#     driver.execute_script("window.scrollBy(0, 35);")
+#     final_search_button = driver.find_element(By.XPATH,'//*[@id="searchBtn"]') 
+#     final_search_button.click()
+#     time.sleep(4)
+#     res = start_parsing(str(term), tenders, term_tenders)
+#     # print("~~",res)
+#     if res == 'NoSuchElementException':
+#         return
+#     else:
+#         tenders[term] = term_tenders
+#         post_process_results(term, tenders, term_tenders)
 def setup_search(term, tenders, term_tenders, main_activityy):
-    print("getting etimad website..")
-    website_url = "https://tenders.etimad.sa/Tender/AllTendersForVisitor?PageNumber=1"
-    driver.get(website_url)
-    print("got etimad website successfully!!!")
-    # expand search
-    search_button = driver.find_element(By.XPATH, "//*[@id='searchBtnColaps']")  # Replace 'button_id' with the actual ID or XPath of the button
-    search_button.click()
+    # Each request gets its own WebDriver instance
+    driver = webdriver.Chrome(options=chrome_options)
+    try:
+        print("getting etimad website..")
+        website_url = "https://tenders.etimad.sa/Tender/AllTendersForVisitor?PageNumber=1"
+        driver.get(website_url)
+        print("got etimad website successfully!!!")
+        
+        # expand search
+        search_button = driver.find_element(By.XPATH, "//*[@id='searchBtnColaps']")
+        search_button.click()
 
-    # click choose tender status
-    driver.execute_script("window.scrollBy(0, 500);")
-    time.sleep(4)
-    status_button = driver.find_element(By.XPATH,"//*[@id='basicInfo']/div/div[2]/div/div/button")                        
-    status_button.click()
+        driver.execute_script("window.scrollBy(0, 500);")
+        time.sleep(4)
+        status_button = driver.find_element(By.XPATH,"//*[@id='basicInfo']/div/div[2]/div/div/button")                        
+        status_button.click()
 
-    # choose active tenders
-    driver.execute_script("window.scrollBy(0, 50);")
-    time.sleep(4)
-    span_element = driver.find_element(By.XPATH,'//*[@id="basicInfo"]/div/div[2]/div/div/div/ul/li[2]/a')                                                                     
-    span_element.click()
+        driver.execute_script("window.scrollBy(0, 50);")
+        time.sleep(4)
+        span_element = driver.find_element(By.XPATH,'//*[@id="basicInfo"]/div/div[2]/div/div/div/ul/li[2]/a')                                                                     
+        span_element.click()
 
-    driver.execute_script("window.scrollBy(0, 175);")
-    time.sleep(4)
-    main_activity = driver.find_element(By.XPATH, '//*[@id="basicInfo"]/div/div[4]/div/div/button')
-    main_activity.click()
+        driver.execute_script("window.scrollBy(0, 175);")
+        time.sleep(4)
+        main_activity = driver.find_element(By.XPATH, '//*[@id="basicInfo"]/div/div[4]/div/div/button')
+        main_activity.click()
 
-    
-    # type اتص to filter results
-    input_element = driver.find_element(By.XPATH, '//*[@id="basicInfo"]/div/div[4]/div/div/div/div/input')
-    input_element.clear()
-    input_element.send_keys(str(main_activityy))
+        input_element = driver.find_element(By.XPATH, '//*[@id="basicInfo"]/div/div[4]/div/div/div/div/input')
+        input_element.clear()
+        input_element.send_keys(str(main_activityy))
 
-    option_xpath = get_xpath_for_option(main_activityy)
-    if option_xpath != "Option not found in the dropdown list.":
-        # Choose the selected option
-        selected_option_element = driver.find_element(By.XPATH, option_xpath)
-        selected_option_element.click()
-    else:
-        print("Error: Selected option not found in the dropdown list.")
-        return
-    
+        option_xpath = get_xpath_for_option(main_activityy)
+        if option_xpath != "Option not found in the dropdown list.":
+            selected_option_element = driver.find_element(By.XPATH, option_xpath)
+            selected_option_element.click()
+        else:
+            print("Error: Selected option not found in the dropdown list.")
+            return
 
-    driver.execute_script("window.scrollBy(0, 50);")
+        driver.execute_script("window.scrollBy(0, 50);")
+        input_element = driver.find_element(By.XPATH, '//*[@id="txtMultipleSearch"]')
+        input_element.clear()
+        input_element.send_keys(term)
 
-    input_element = driver.find_element(By.XPATH, '//*[@id="txtMultipleSearch"]')
-    input_element.clear()
-    input_element.send_keys(term)
+        driver.execute_script("window.scrollBy(0, 35);")
+        final_search_button = driver.find_element(By.XPATH,'//*[@id="searchBtn"]') 
+        final_search_button.click()
+        time.sleep(4)
 
-    # finally hit search
-    driver.execute_script("window.scrollBy(0, 35);")
-    final_search_button = driver.find_element(By.XPATH,'//*[@id="searchBtn"]') 
-    final_search_button.click()
-    time.sleep(4)
-    res = start_parsing(str(term), tenders, term_tenders)
-    # print("~~",res)
-    if res == 'NoSuchElementException':
-        return
-    else:
-        tenders[term] = term_tenders
-        post_process_results(term, tenders, term_tenders)
-
+        start_parsing(str(term), tenders, term_tenders, driver)
+        
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    finally:
+        driver.quit()
 def get_terms_files(keywords, main_activity):
     for term in keywords:
         print("term: ", term)
