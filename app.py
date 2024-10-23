@@ -45,7 +45,8 @@ def save_user_progress(username, keywords, selected_option, task_complete):
 # Function to check if any task is in progress for the logged-in user
 def is_task_in_progress(username):
     progress = load_user_progress_from_file(username)
-    return not progress["task_complete"]
+    return not progress.get("task_complete", True)
+
 
 def extract_keywords_from_file(uploaded_file):
     try:
@@ -144,13 +145,20 @@ def show_email_input_page():
 
     if st.button("Submit"):
         # Save user progress and start background task
-        save_user_progress_to_file(st.session_state["username"], {"keywords": all_keywords, "selected_option": st.session_state["selected_option"], "task_complete": False})
-
-        # Start the background process in a thread
-        thread = threading.Thread(target=process_request, args=(emails, all_keywords, st.session_state["selected_option"], st.session_state["username"]))
-        thread.start()
-
+        save_user_progress_to_file(
+        st.session_state["username"],
+        {
+            "keywords": all_keywords,
+            "selected_option": st.session_state["selected_option"],
+            "task_complete": False,
+        },
+    )
         st.info("The process is running in the background. You will receive an email shortly.")
+        # Start the background process in a thread
+        process_request(emails, all_keywords, st.session_state["selected_option"], st.session_state["username"])
+        
+
+        
 
     # Check task completion
     if check_user_task(st.session_state["username"]):
@@ -158,38 +166,35 @@ def show_email_input_page():
 
 def process_request(emails, keywords, selected_option, username):
     try:
+        progress = load_user_progress_from_file(username)
+        progress["task_complete"] = False
+        save_user_progress_to_file(username, progress)
+
         time.sleep(5)  # Simulate processing time
+
         subject = f"Search Results for {', '.join(keywords)}"
         body = f"Keywords: {', '.join(keywords)}\nSelected Option: {selected_option}\nPlease find the attached results."
 
         get_terms_files(keywords, str(selected_option))  # Assume this is a defined function
         agg_files()  # Assume this is a defined function
 
-        today_date = pd.to_datetime('today').strftime('%Y-%m-%d')
+        today_date = pd.to_datetime("today").strftime("%Y-%m-%d")
         file_name = f"tenders_{today_date}_filtered.csv"
-        
-        # Load progress and mark task as in progress
-        progress = load_user_progress_from_file(username)
-        progress["task_complete"] = False
-        save_user_progress_to_file(username, progress)
 
         if not os.path.isfile(file_name):
             # Handle case where no results are found
-            progress["task_complete"] = True
-            save_user_progress_to_file(username, progress)
             send_email_without_results(emails, subject, body)
-            return
+            return  # Early return if no results found
 
         # Send email with results
         send_email(emails, subject, body)
 
-        # Mark task as complete
-        progress["task_complete"] = True
-        save_user_progress_to_file(username, progress)
-
     except Exception as e:
         print(f"Error: {e}")  # Log the error
-        # Mark task as complete regardless of failure
+
+    finally:
+        # Mark task as complete regardless of success or failure
+        progress = load_user_progress_from_file(username)
         progress["task_complete"] = True
         save_user_progress_to_file(username, progress)
 
