@@ -218,6 +218,7 @@ def start_parsing(term, tenders, term_tenders,driver):
 def setup_search(term, tenders, term_tenders, main_activityy):
     # Each request gets its own WebDriver instance
     driver = webdriver.Chrome(options=chrome_options)
+    driver.maximize_window()
     try:
         print("getting etimad website..")
         website_url = "https://tenders.etimad.sa/Tender/AllTendersForVisitor?PageNumber=1"
@@ -271,6 +272,7 @@ def setup_search(term, tenders, term_tenders, main_activityy):
         print(f"An error occurred: {str(e)}")
     finally:
         driver.quit()
+
 def get_terms_files(keywords, main_activity):
     for term in keywords:
         print("term: ", term)

@@ -30,15 +30,19 @@ def send_email(to_addresses, subject, body):
 
     # Attach the CSV file
     filename = f'tenders_{today_date}_filtered.xlsx'
-    attachment = open(filename, 'rb')
 
-    part = MIMEBase('application', 'octet-stream')
-    part.set_payload(attachment.read())
-    encoders.encode_base64(part)
-    part.add_header('Content-Disposition', f'attachment; filename= {os.path.basename(filename)}')
+    if os.path.exists(filename):
+        attachment = open(filename, 'rb')
 
-    msg.attach(part)
-    attachment.close()
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload(attachment.read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', f'attachment; filename= {os.path.basename(filename)}')
+
+        msg.attach(part)
+        attachment.close()
+    else:
+        print(f"{filename} does not exist.")
 
     # Connect to Gmail server and send the email
     server = smtplib.SMTP(smtp_server, smtp_port)

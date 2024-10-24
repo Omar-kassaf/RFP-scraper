@@ -175,8 +175,8 @@ def process_request(emails, keywords, selected_option, username):
         subject = f"Search Results for {', '.join(keywords)}"
         body = f"Keywords: {', '.join(keywords)}\nSelected Option: {selected_option}\nPlease find the attached results."
 
-        get_terms_files(keywords, str(selected_option))  # Assume this is a defined function
-        agg_files()  # Assume this is a defined function
+        get_terms_files(keywords, str(selected_option))  
+        agg_files() 
 
         today_date = pd.to_datetime("today").strftime("%Y-%m-%d")
         file_name = f"tenders_{today_date}_filtered.csv"

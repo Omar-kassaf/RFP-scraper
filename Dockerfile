@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Install required packages for Chrome and other dependencies
 RUN apt-get update && apt-get install -y \
-`    wget \
+    wget \
     unzip \
     libnss3 \
     libxss1 \
@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     libgbm-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Add Google's official GPG key
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - 
